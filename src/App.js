@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
+const App = () => {
+  // to know whether the API call has loaded or not
+  const [loading, setLoading] = useState(true);
+  // state to manage quote
+  const [quote, setQuote] = useState("");
+  // state to manage author
+  const [author, setAuthor] = useState("");
+  //  state to manage click of button
+  const [newQuote, setNewQuote] = useState(false);
+  async function randomQuote() {
+    const response = await fetch("https://api.quotable.io/random");
+    const data = await response.json();
+    setAuthor(data.author);
+    setQuote(data.content);
+  }
+
+  const handleNewQuoteClick = () => {
+    setNewQuote(!newQuote);
+  };
+
+  useEffect(() => {
+    randomQuote();
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    console.log(newQuote);
+    randomQuote();
+  }, [newQuote]);
+
+  if (loading) {
+    return <h2>Loading...</h2>;
+  } else {
+    return (
+      <div>
+        <p id="text">{quote}</p>
+        <p id="author">{author}</p>
         <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+          id="tweet-quote"
+          href={`https://twitter.com/intent/tweet?text="${quote}"%20${author}&hashtags=quotes`}
         >
-          Learn React
+          Tweet Quote
         </a>
-      </header>
-    </div>
-  );
-}
+        <button id="new-quote" onClick={handleNewQuoteClick}>
+          New Quote
+        </button>
+      </div>
+    );
+  }
+};
 
 export default App;
